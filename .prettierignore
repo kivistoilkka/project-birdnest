@@ -1,0 +1,6 @@
+## From prettier install guide
+build
+
+## From .gitignore
+node_modules
+.env
