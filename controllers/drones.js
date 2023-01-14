@@ -1,41 +1,41 @@
-const router = require('express').Router()
+const { NO_FLY_ZONE_RADIUS } = require('../utils/config')
 
-//let drones = {}
-let drones = {
-  'SN-biFmem4lfL': {
-    snapShotTime: '2023-01-14T16:42:18.359Z',
-    positionX: '188180.85821004366',
-    positionY: '315027.2074024313',
-    distance: '21753.479428132378',
-  },
-  'SN-EZSugEzZaa': {
-    snapShotTime: '2023-01-14T16:42:44.377Z',
-    positionX: '293172.8595163385',
-    positionY: '287262.1905530378',
-    distance: '57029.52431529129',
-  },
-  'SN--lLEGGckgb': {
-    snapShotTime: '2023-01-14T16:42:58.387Z',
-    positionX: '280077.8237844714',
-    positionY: '287866.07733790466',
-    distance: '48358.19782177463',
-  },
+const router = require('express').Router()
+const { getData, filterExpiredDrones } = require('../utils/droneData')
+
+let dronesInVicinity = {}
+
+const updateDrones = async () => {
+  const newData = await getData()
+  //TODO: handle error from server (e.g. too many queries)
+  const newDrones = newData.dronesJson
+  const newSnapshotTime = newData.snapshotTime
+
+  const updatedDrones = structuredClone(dronesInVicinity)
+  newDrones.forEach((drone) => {
+    let oldDistance = Number.MAX_SAFE_INTEGER
+    if (drone.serial in dronesInVicinity) {
+      oldDistance = parseFloat(dronesInVicinity[drone.serial].distance)
+    }
+    if (drone.distance < NO_FLY_ZONE_RADIUS) {
+      updatedDrones[drone.serial] = {
+        snapShotTime: newSnapshotTime,
+        positionX: drone.positionX,
+        positionY: drone.positionY,
+        distance: Math.min(oldDistance, parseFloat(drone.distance)).toString(),
+      }
+    }
+  })
+
+  const filteredDrones = filterExpiredDrones(updatedDrones)
+
+  dronesInVicinity = filteredDrones
+  console.log('Drones updated:', newSnapshotTime)
+  console.log(dronesInVicinity)
 }
 
 router.get('/drones', (req, res) => {
-  return res.json(drones)
+  return res.json(dronesInVicinity)
 })
 
-router.get('/realtime-drones', (req, res) => {
-  res.writeHead(200, {
-    Connection: 'keep-alive',
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-  })
-  setInterval(() => {
-    res.write('data:' + JSON.stringify(drones))
-    res.write('\\n\\n')
-  }, 2000)
-})
-
-module.exports = router
+module.exports = { router, updateDrones }
