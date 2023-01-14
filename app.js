@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 
+const cors = require('cors')
+app.use(cors())
+
 const dronesRouter = require('./controllers/drones')
 const middleware = require('./utils/middleware')
 
