@@ -1,11 +1,33 @@
 const axios = require('axios')
 const { parseDroneData } = require('./droneDataParser')
-const { DRONE_DATA_URL, PILOT_INFORMATION_PERSIST_TIME } = require('./config')
+const {
+  DRONE_DATA_URL,
+  PILOT_INFORMATION_PERSIST_TIME,
+  NO_FLY_ZONE_RADIUS,
+} = require('./config')
 
-const getData = async () => {
+const getDroneData = async () => {
   const page = await axios(DRONE_DATA_URL)
-  const parsedData = parseDroneData(page)
+  const parsedData = parseDroneData(page.data)
   return parsedData
+}
+
+const addNewDronesAndUpdateDistances = (newData, newSnapshotTime, oldData) => {
+  const updatedDrones = structuredClone(oldData)
+  newData.forEach((drone) => {
+    let oldDistance = Number.MAX_SAFE_INTEGER
+    if (drone.serial in oldData) {
+      oldDistance = parseFloat(oldData[drone.serial].distance)
+    }
+
+    if (drone.distance < NO_FLY_ZONE_RADIUS) {
+      updatedDrones[drone.serial] = {
+        snapShotTime: newSnapshotTime,
+        distance: Math.min(oldDistance, parseFloat(drone.distance)).toString(),
+      }
+    }
+  })
+  return updatedDrones
 }
 
 const filterExpiredDrones = (drones) => {
@@ -20,4 +42,8 @@ const filterExpiredDrones = (drones) => {
   return filteredDrones
 }
 
-module.exports = { getData, filterExpiredDrones }
+module.exports = {
+  getDroneData,
+  addNewDronesAndUpdateDistances,
+  filterExpiredDrones,
+}

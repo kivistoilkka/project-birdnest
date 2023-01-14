@@ -2,7 +2,7 @@ const { convertXML } = require('simple-xml-to-json')
 const { distanceCalculator } = require('./distanceCalculator')
 
 const parseDroneData = (data) => {
-  const dataJson = convertXML(data.data)
+  const dataJson = convertXML(data)
   const snapshotTime = dataJson.report.children[1].capture.snapshotTimestamp
   const drones = dataJson.report.children[1].capture.children
   const dronesJson = drones.map((d) => {
@@ -15,8 +15,6 @@ const parseDroneData = (data) => {
     )
     return {
       serial,
-      positionY,
-      positionX,
       distance: distance.toString(),
     }
   })
