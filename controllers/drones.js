@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { EventEmitter } = require('node:events')
 const {
   getDroneData,
   addNewDronesAndUpdateDistances,
@@ -9,6 +10,10 @@ const { updatePilots } = require('../utils/pilotData')
 let dronesInVicinity = {}
 let pilots = {}
 let dronesWithPilots = {}
+
+class MyEmitter extends EventEmitter {}
+
+const droneEmitter = new MyEmitter()
 
 const updateDrones = async () => {
   const newData = await getDroneData()
@@ -38,6 +43,7 @@ const updateDrones = async () => {
   })
   dronesWithPilots = updatedDronesWithPilots
 
+  droneEmitter.emit('dronesUpdated', dronesWithPilots)
   console.log('Drones updated:', newSnapshotTime)
 }
 
@@ -45,4 +51,4 @@ router.get('/drones', (req, res) => {
   return res.json(dronesWithPilots)
 })
 
-module.exports = { router, updateDrones }
+module.exports = { router, updateDrones, droneEmitter }
