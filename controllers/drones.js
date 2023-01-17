@@ -58,7 +58,6 @@ const handleUpdate = async (newData) => {
     console.log('Getting pilot data for', serial)
     getPilotData(serial).then((response) => {
       dronesInVicinity[serial].pilot = response
-      console.log('Updated pilot', dronesInVicinity[serial].pilot)
     })
   })
 
