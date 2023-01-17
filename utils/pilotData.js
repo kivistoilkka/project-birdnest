@@ -11,7 +11,7 @@ const getPilotData = async (droneSerial) => {
   return pilot
 }
 
-const updatePilots = async (droneSerials, oldPilots) => {
+const updatePilots = (droneSerials, oldPilots) => {
   const updatedPilots = structuredClone(oldPilots)
   let serials = [...droneSerials]
   Object.keys(oldPilots).forEach((serial) => {
@@ -23,6 +23,7 @@ const updatePilots = async (droneSerials, oldPilots) => {
   serials.forEach((s) => {
     console.log('Getting pilot data for', s)
     getPilotData(s).then((response) => {
+      console.log('Pilot data response:', response)
       updatedPilots[s] = response
     })
   })
