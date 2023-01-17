@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const { EventEmitter } = require('node:events')
 const {
   getDroneData,
   selectNewAndUpdatedDrones,
@@ -8,28 +7,6 @@ const {
 const { getPilotData } = require('../utils/pilotData')
 
 let dronesInVicinity = {}
-
-class MyEmitter extends EventEmitter {}
-
-const droneEmitter = new MyEmitter()
-
-// const handlePilotUpdate = (droneSerials) => {
-//   const updatedPilots = structuredClone(oldPilots)
-//   let serials = [...droneSerials]
-//   Object.keys(oldPilots).forEach((serial) => {
-//     if (!(serial in droneSerials)) {
-//       delete updatedPilots.serial
-//     }
-//     serials = serials.filter((s) => s !== serial)
-//   })
-//   serials.forEach((s) => {
-//     console.log('Getting pilot data for', s)
-//     getPilotData(s).then((response) => {
-//       updatedPilots[s] = response
-//     })
-//   })
-//   return updatedPilots
-// }
 
 const handleUpdate = async (newData) => {
   const newDrones = newData.droneList
@@ -41,7 +18,16 @@ const handleUpdate = async (newData) => {
     dronesInVicinity
   )
   dronesToUpdate.forEach((drone) => {
+    let pilot = null
+    if (
+      dronesInVicinity[drone.serial] !== undefined &&
+      dronesInVicinity[drone.serial].pilot !== undefined
+    )
+      pilot = dronesInVicinity[drone.serial].pilot
     dronesInVicinity[drone.serial] = drone
+    if (pilot !== null) {
+      dronesInVicinity[drone.serial].pilot = pilot
+    }
   })
 
   const timeNow = new Date()
@@ -50,10 +36,9 @@ const handleUpdate = async (newData) => {
     delete dronesInVicinity[drone.serial]
   })
 
-  //TODO: Refactoring of pilot updates
-  const dronesWithPilotsToUpdate = dronesToUpdate
-    .filter((drone) => dronesInVicinity[drone.serial].pilot === undefined)
-    .map((drone) => drone.serial)
+  const dronesWithPilotsToUpdate = Object.keys(dronesInVicinity).filter(
+    (serial) => dronesInVicinity[serial].pilot === undefined
+  )
   dronesWithPilotsToUpdate.forEach((serial) => {
     console.log('Getting pilot data for', serial)
     getPilotData(serial).then((response) => {
@@ -66,18 +51,45 @@ const handleUpdate = async (newData) => {
     dronesToRemove.length > 0 ||
     dronesWithPilotsToUpdate.length > 0
   console.log('Need to update:', needToUpdate)
-  return needToUpdate
+  return {
+    needToUpdate,
+    dronesToUpdate,
+    dronesToRemove,
+    dronesWithPilotsToUpdate,
+  }
 }
 
 const updateDrones = async (io) => {
   const newData = await getDroneData()
   const newSnapshotTime = newData.snapshotTime
   console.log('New data fetched:', newSnapshotTime)
-  const needToUpdate = await handleUpdate(newData)
+  const {
+    needToUpdate,
+    dronesToUpdate,
+    dronesToRemove,
+    //dronesWithPilotsToUpdate,
+  } = await handleUpdate(newData)
   if (needToUpdate) {
-    //droneEmitter.emit('dronesUpdated', dronesWithPilots)
-    io.emit('dronesUpdated', JSON.stringify(dronesInVicinity))
-    console.log('Drones updated:', newSnapshotTime)
+    if (dronesToUpdate.length > 0) {
+      //console.log('Emitting updated drones:', JSON.stringify(dronesToUpdate))
+      //io.emit('dronesUpdated', JSON.stringify(dronesToUpdate))
+      io.emit('dronesUpdated', JSON.stringify(dronesInVicinity))
+    }
+    if (dronesToRemove.length > 0) {
+      //console.log('Emitting removed drones:', JSON.stringify(dronesToRemove))
+      //io.emit('dronesRemoved', JSON.stringify(dronesToRemove))
+      io.emit('dronesUpdated', JSON.stringify(dronesInVicinity))
+    }
+
+    // const pilotsToUpdate = dronesWithPilotsToUpdate
+    //   .filter((serial) => dronesInVicinity[serial].pilot === null)
+    //   .map((serial) => dronesInVicinity[serial].pilot)
+    // if (pilotsToUpdate.length > 0) {
+    //   console.log('DRONES WITH PILOTS TO UPDATE', pilotsToUpdate)
+    //   console.log('Emitting updated pilots:', JSON.stringify(pilotsToUpdate))
+    //   io.emit('pilotsUpdated', JSON.stringify(pilotsToUpdate))
+    // }
+    console.log('Data updated:', newSnapshotTime)
   }
 }
 
@@ -85,4 +97,4 @@ router.get('/drones', (req, res) => {
   return res.json(dronesInVicinity)
 })
 
-module.exports = { router, updateDrones, droneEmitter }
+module.exports = { router, updateDrones }

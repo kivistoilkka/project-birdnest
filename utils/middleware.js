@@ -13,6 +13,8 @@ const errorHandler = (error, request, response) => {
   //   return response.status(400).json({ error: error.message })
   // }
 
+  // Application Error?
+
   //next(error)
 }
 
