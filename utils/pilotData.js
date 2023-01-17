@@ -11,23 +11,4 @@ const getPilotData = async (droneSerial) => {
   return pilot
 }
 
-const updatePilots = (droneSerials, oldPilots) => {
-  const updatedPilots = structuredClone(oldPilots)
-  let serials = [...droneSerials]
-  Object.keys(oldPilots).forEach((serial) => {
-    if (!(serial in droneSerials)) {
-      delete updatedPilots.serial
-    }
-    serials = serials.filter((s) => s !== serial)
-  })
-  serials.forEach((s) => {
-    console.log('Getting pilot data for', s)
-    getPilotData(s).then((response) => {
-      console.log('Pilot data response:', response)
-      updatedPilots[s] = response
-    })
-  })
-  return updatedPilots
-}
-
-module.exports = { getPilotData, updatePilots }
+module.exports = { getPilotData } //updatePilots }

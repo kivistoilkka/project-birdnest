@@ -40,7 +40,7 @@ const handleUpdate = async (newData) => {
     (serial) => dronesInVicinity[serial].pilot === undefined
   )
   dronesWithPilotsToUpdate.forEach((serial) => {
-    console.log('Getting pilot data for', serial)
+    //console.log('Getting pilot data for', serial)
     getPilotData(serial).then((response) => {
       dronesInVicinity[serial].pilot = response
     })
@@ -50,25 +50,25 @@ const handleUpdate = async (newData) => {
     dronesToUpdate.length > 0 ||
     dronesToRemove.length > 0 ||
     dronesWithPilotsToUpdate.length > 0
-  console.log('Need to update:', needToUpdate)
   return {
     needToUpdate,
     dronesToUpdate,
     dronesToRemove,
-    dronesWithPilotsToUpdate,
+    //dronesWithPilotsToUpdate,
   }
 }
 
 const updateDrones = async (io) => {
   const newData = await getDroneData()
-  const newSnapshotTime = newData.snapshotTime
-  console.log('New data fetched:', newSnapshotTime)
+  //const newSnapshotTime = newData.snapshotTime
+  //console.log('New data fetched:', newSnapshotTime)
   const {
     needToUpdate,
     dronesToUpdate,
     dronesToRemove,
     //dronesWithPilotsToUpdate,
   } = await handleUpdate(newData)
+  //console.log('Need to update:', needToUpdate)
   if (needToUpdate) {
     if (dronesToUpdate.length > 0) {
       //console.log('Emitting updated drones:', JSON.stringify(dronesToUpdate))
@@ -89,7 +89,8 @@ const updateDrones = async (io) => {
     //   console.log('Emitting updated pilots:', JSON.stringify(pilotsToUpdate))
     //   io.emit('pilotsUpdated', JSON.stringify(pilotsToUpdate))
     // }
-    console.log('Data updated:', newSnapshotTime)
+
+    //console.log('Data updated:', newSnapshotTime)
   }
 }
 

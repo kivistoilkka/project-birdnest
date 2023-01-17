@@ -14,7 +14,7 @@ const getDroneData = async () => {
 
 const selectNewAndUpdatedDrones = (newDrones, newSnapshotTime, oldData) => {
   const filtered = newDrones.filter(
-    (drone) => drone.distance < NO_FLY_ZONE_RADIUS
+    (drone) => parseFloat(drone.distance) < NO_FLY_ZONE_RADIUS
   )
   const toUpdate = filtered.map((drone) => {
     let oldDistance = Number.MAX_SAFE_INTEGER

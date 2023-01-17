@@ -7,10 +7,10 @@ const server = http.createServer(app)
 const io = new Server(server)
 
 io.on('connection', (socket) => {
-  console.log('a client connected')
+  console.log(new Date(), 'a client connected')
 
   socket.on('disconnect', () => {
-    console.log('user disconnected')
+    console.log(new Date(), 'client disconnected')
   })
 
   // socket.on('error', (err) => {

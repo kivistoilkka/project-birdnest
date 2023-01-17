@@ -7,6 +7,7 @@ app.use(cors())
 
 const dronesRouter = require('./controllers/drones').router
 const middleware = require('./utils/middleware')
+app.use(express.static('build'))
 
 app.use('/api/', dronesRouter)
 

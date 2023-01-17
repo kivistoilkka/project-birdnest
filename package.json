@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node fm.js",
+    "start:without-fm": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint .",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "build:ui": "rm -rf build && cd ../project-birdnest-frontend/ && npm run build && cp -r build ../project-birdnest",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs"
   },
   "author": "Ilkka Kivistö",
   "license": "MIT",
@@ -25,6 +30,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
+    "forever-monitor": "^3.0.3",
     "simple-xml-to-json": "^1.0.9",
     "socket.io": "^4.5.4"
   }
