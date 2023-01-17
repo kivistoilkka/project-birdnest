@@ -21,6 +21,7 @@ const updatePilots = async (droneSerials, oldPilots) => {
     serials = serials.filter((s) => s !== serial)
   })
   serials.forEach((s) => {
+    console.log('Getting pilot data for', s)
     getPilotData(s).then((response) => {
       updatedPilots[s] = response
     })

@@ -15,9 +15,7 @@ class MyEmitter extends EventEmitter {}
 
 const droneEmitter = new MyEmitter()
 
-const updateDrones = async () => {
-  const newData = await getDroneData()
-  //TODO: handle error from server (e.g. too many queries)
+const handleUpdate = async (newData) => {
   const newDrones = newData.dronesJson
   const newSnapshotTime = newData.snapshotTime
 
@@ -41,8 +39,13 @@ const updateDrones = async () => {
     updatedDronesWithPilots[serial] = dronesInVicinity[serial]
     updatedDronesWithPilots[serial].pilot = pilots[serial]
   })
-  dronesWithPilots = updatedDronesWithPilots
+  return updatedDronesWithPilots
+}
 
+const updateDrones = async () => {
+  const newData = await getDroneData()
+  const newSnapshotTime = newData.snapshotTime
+  dronesWithPilots = await handleUpdate(newData)
   droneEmitter.emit('dronesUpdated', dronesWithPilots)
   console.log('Drones updated:', newSnapshotTime)
 }
