@@ -12,11 +12,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(new Date(), 'client disconnected')
   })
-
-  // socket.on('error', (err) => {
-  //   console.log('Caught flash policy server socket error:')
-  //   console.log(err.stack)
-  // })
 })
 
 const { DRONE_DATA_UPDATE_INTERVAL } = require('./utils/config')

@@ -11,4 +11,4 @@ const getPilotData = async (droneSerial) => {
   return pilot
 }
 
-module.exports = { getPilotData } //updatePilots }
+module.exports = { getPilotData }
