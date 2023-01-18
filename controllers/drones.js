@@ -53,19 +53,26 @@ const handleUpdate = async (newData) => {
     needToUpdate,
     dronesToUpdate,
     dronesToRemove,
+    dronesWithPilotsToUpdate,
   }
 }
 
 const updateDrones = async (io) => {
   const newData = await getDroneData()
-  const { needToUpdate, dronesToUpdate, dronesToRemove } = await handleUpdate(
-    newData
-  )
+  const {
+    needToUpdate,
+    dronesToUpdate,
+    dronesToRemove,
+    dronesWithPilotsToUpdate,
+  } = await handleUpdate(newData)
   if (needToUpdate) {
     if (dronesToUpdate.length > 0) {
       io.emit('dronesUpdated', JSON.stringify(dronesInVicinity))
     }
     if (dronesToRemove.length > 0) {
+      io.emit('dronesUpdated', JSON.stringify(dronesInVicinity))
+    }
+    if (dronesWithPilotsToUpdate.length > 0) {
       io.emit('dronesUpdated', JSON.stringify(dronesInVicinity))
     }
   }
