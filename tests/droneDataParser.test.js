@@ -15,5 +15,10 @@ test('XML data is parsed correctly', () => {
   const result = parseDroneData(testXML)
   expect(result.snapshotTime).toBe(expectedResult.snapshotTime)
   expect(result.droneList.length).toBe(expectedResult.droneList.length)
-  expect(result.droneList[2].distance).toBe('197794.63102029974')
+  for (let i = 0; i < result.droneList.length; i++) {
+    expect(result.droneList[i].serial).toBe(expectedResult.droneList[i].serial)
+    expect(result.droneList[i].distance).toBe(
+      expectedResult.droneList[i].distance
+    )
+  }
 })
