@@ -17,7 +17,7 @@ const testData = {
   'SN-xw9mRa7f4F': {
     serial: 'SN-xw9mRa7f4F',
     snapShotTime: '2023-01-18T16:48:20.768Z',
-    distance: '58479.82513604958', // Outside of no fly zone in testDrones
+    distance: '58479.82513604958', // Outside of no fly zone in testDrones, but time to be updated
     pilot: {
       name: 'Nader, Louvenia',
       email: 'louvenia.nader@example.com',
@@ -60,7 +60,7 @@ const testSnapshotTime = '2023-01-17T15:48:40.536Z'
 const testDrones = [
   { serial: 'SN-RAobIrdG-J', distance: '64090.95751518291' }, // Existing drone, to update
   { serial: 'SN-mXT4QVifIn', distance: '27217.616139556932' }, // Existing drone, to update
-  { serial: 'SN-xw9mRa7f4F', distance: '197794.63102029974' }, // Existing drone, but not to update
+  { serial: 'SN-xw9mRa7f4F', distance: '197794.63102029974' }, // Existing drone, to update
   { serial: 'SN-bwAA_-2IjJ', distance: '161320.87154301748' }, // Not to be added
   { serial: 'SN-Z12MPRUigk', distance: '56596.38979018068' }, // New drone
 ]
@@ -109,6 +109,11 @@ test('selectNewAndUpdatedDrones returns correct drones for update with existing 
       serial: 'SN-mXT4QVifIn',
       snapShotTime: '2023-01-17T15:48:40.536Z',
       distance: '27217.616139556932',
+    },
+    {
+      serial: 'SN-xw9mRa7f4F',
+      snapShotTime: '2023-01-17T15:48:40.536Z',
+      distance: '58479.82513604958',
     },
     {
       serial: 'SN-Z12MPRUigk',
